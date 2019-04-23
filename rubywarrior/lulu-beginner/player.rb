@@ -47,8 +47,24 @@ class Player
 		@previous_health = @current_health
 	end
 
+	def solve_level_5
+		@current_health = warrior.health
+		@previous_health = @current_health unless @previous_health
+
+		if warrior.feel.enemy?
+			warrior.attack!
+		elsif warrior.feel.captive?
+			warrior.rescue!
+		elsif @current_health < FULL_HEALTH && @current_health >= @previous_health
+			warrior.rest!
+		else
+			warrior.walk!
+		end
+		@previous_health = @current_health
+	end
+
   def play_turn(warrior)
   	@warrior = warrior
-  	solve_level_4
+  	solve_level_5
   end
 end
