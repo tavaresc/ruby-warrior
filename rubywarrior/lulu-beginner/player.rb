@@ -9,7 +9,7 @@ class Player
 		return current_health < FULL_HEALTH && current_health >= previous_health
 	end
 
-	def need_pivot_to_rest?(current_health, previous_health)
+	def need_rest2?(current_health, previous_health)
 		return current_health < FULL_HEALTH && current_health < previous_health
 	end
 
@@ -150,9 +150,45 @@ class Player
 		end
 	end
 
+	def solve_level_9
+		last_phase = 3
+		@current_health = warrior.health
+		@previous_health = @current_health unless @previous_health
+		@current_phase = 0 unless @current_phase
+
+		def current_phase_done?
+			spaces = warrior.look
+			spaces.last.wall? && spaces.take(2).all? { |s| s.empty? || s.stairs? || s.wall? }
+		end
+
+		def invert_direction
+			@current_phase += 1
+			warrior.pivot!
+		end
+
+		space = warrior.feel
+		enemy_index = warrior.look.find_index { |s| s.enemy? }
+
+		if @current_phase == 0 || (@current_phase != last_phase && current_phase_done?)
+			invert_direction
+		elsif	space.enemy?
+			warrior.attack!
+		elsif space.captive?
+			warrior.rescue!
+		elsif enemy_index && warrior.look.take(enemy_index).all? { |s| s.empty? }
+			warrior.shoot!
+		elsif !(space.stairs?) && need_rest?(@current_health, @previous_health)
+			warrior.rest!
+		else
+			warrior.walk!
+		end
+
+		@previous_health = @current_health
+	end
+
 	def play_turn(warrior)
 		@warrior = warrior
-		solve_level_8
+		solve_level_9
 			#level7 = Level7.new(@warrior, FULL_HEALTH)
 			#level7.solve_level_7
 			#Level1.new(warrior)
