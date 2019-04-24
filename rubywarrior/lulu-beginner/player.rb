@@ -75,6 +75,7 @@ class Player
 		@direction = :backward unless @direction
 
 		def change_direction
+			# TODO : remove result
 			result = 
 			if @direction == :backward
 				:forward
@@ -97,6 +98,7 @@ class Player
 		end
 
 		def must_change_direction?
+			# TODO: remove return
 			return warrior.feel(@direction).wall? || need_rest?(@current_health, @previous_health)
 		end
 
@@ -133,11 +135,26 @@ class Player
 		@previous_health = @current_health
 	end
 
+	def solve_level_8
+		space = warrior.feel
+		enemy_index = warrior.look.find_index { |s| s.enemy? }
+
+		if space.enemy?
+			warrior.attack!
+		elsif space.captive?
+			warrior.rescue!
+		elsif enemy_index && warrior.look.take(enemy_index).all? { |s| s.empty? }
+			warrior.shoot!
+		else
+			warrior.walk!
+		end
+	end
+
 	def play_turn(warrior)
 		@warrior = warrior
-		solve_level_7
-		#level7 = Level7.new(@warrior, FULL_HEALTH)
-		#level7.solve_level_7
-		#Level1.new(warrior)
+		solve_level_8
+			#level7 = Level7.new(@warrior, FULL_HEALTH)
+			#level7.solve_level_7
+			#Level1.new(warrior)
 	end
 end
