@@ -1,10 +1,4 @@
-class Level1 
-	attr_accessor :warrior
-
-	def initialize(warrior)
-		@warrior = warrior
-	end
-
+module Level1
 	def solve_level_1
 		warrior.walk!
 	end

@@ -1,196 +1,60 @@
+require_relative "level1"
+require_relative "level2"
+require_relative "level3"
+require_relative "level4"
+require_relative "level5"
+require_relative "level6"
 require_relative "level7"
+require_relative "level8"
+require_relative "level9"
 
 class Player
+	include Level1
+	include Level2
+	include Level3
+	include Level4
+	include Level5
+	include Level6
+	include Level7
+	include Level8
+	include Level9
+
 	FULL_HEALTH = 20
 
 	attr_accessor :warrior
 
+	# "current_health > previous_health" means that the warrior has been
+	# resting (and can keep it) or al least not damaged
+	# "current_health = previous_health" means that the warrior got no
+	# damages in the previous turn (health kept the same during 2 turns) 
 	def need_rest?(current_health, previous_health)
 		return current_health < FULL_HEALTH && current_health >= previous_health
 	end
 
-	def need_rest2?(current_health, previous_health)
-		return current_health < FULL_HEALTH && current_health < previous_health
+	def must_change_direction?
+		warrior.feel(@direction).wall? || need_rest?(@current_health, @previous_health)
 	end
 
-	def solve_level_1
-		warrior.walk!
-	end
-
-	def solve_level_2
-		if warrior.feel.empty?
-			warrior.walk!
+	def change_direction
+		if @direction == :backward
+			:forward
 		else
-			warrior.attack!
+			:backward
 		end
 	end
 
-	def solve_level_3
-		if warrior.feel.enemy?
-			warrior.attack!
-		else
-			warrior.health < FULL_HEALTH ? warrior.rest! : warrior.walk!
-		end
-	end
-
-	def solve_level_4
-		@current_health = warrior.health
-		@previous_health = @current_health unless @previous_health
-
-		if warrior.feel.enemy?
-			warrior.attack!
-		else
-			# "current_health > previous_health" means that the warrior has been
-			# resting (and can keep it)
-			# "current_health = previous_health" means that the warrior got no
-			# damages in the previous turn (health kept the same during 2 turns) 
-			if @current_health < FULL_HEALTH && @current_health >= @previous_health
-				warrior.rest!
-			else
-				warrior.walk!
-			end
-		end
-		@previous_health = @current_health
-	end
-
-	def solve_level_5
-		@current_health = warrior.health
-		@previous_health = @current_health unless @previous_health
-
-		if warrior.feel.enemy?
-			warrior.attack!
-		elsif warrior.feel.captive?
-			warrior.rescue!
-		elsif @current_health < FULL_HEALTH && @current_health >= @previous_health
-			warrior.rest!
-		else
-			warrior.walk!
-		end
-		@previous_health = @current_health
-	end
-
-	def solve_level_6
-		@current_health = warrior.health
-		@previous_health = @current_health unless @previous_health
-		@direction = :backward unless @direction
-
-		def change_direction
-			# TODO : remove result
-			result = 
-			if @direction == :backward
-				:forward
-			else
-				:backward
-			end
-			return result
-		end
-
-		def call_actions(space)
-			if space.enemy?
-				warrior.attack!(@direction)
-			elsif space.captive?
-				warrior.rescue!(@direction)
-			elsif !(space.stairs?) && need_rest?(@current_health, @previous_health)
-				warrior.rest!
-			else
-				warrior.walk!(@direction)
-			end
-		end
-
-		def must_change_direction?
-			# TODO: remove return
-			return warrior.feel(@direction).wall? || need_rest?(@current_health, @previous_health)
-		end
-
-		call_actions(warrior.feel(@direction))
-
-		@direction = change_direction if must_change_direction?
-		@previous_health = @current_health
-	end
-
-	def solve_level_7
-		@current_health = warrior.health
-		@previous_health = @current_health unless @previous_health
-		space = warrior.feel
-
-		print "-- current_health = #{@current_health} \n"
-		print "-- previous_health = #{@previous_health} \n"
-
-		if space.wall?
-			warrior.pivot!
-		elsif space.enemy?
-			warrior.attack!
-		elsif space.captive?
-			warrior.rescue!
-		elsif !(space.stairs?) && need_rest?(@current_health, @previous_health)
-			if warrior.feel(:backward).wall?
-				warrior.rest!
-			else
-				warrior.walk!(:backward)
-			end
-		elsif
-			warrior.walk!
-		end
-
-		@previous_health = @current_health
-	end
-
-	def solve_level_8
-		space = warrior.feel
-		enemy_index = warrior.look.find_index { |s| s.enemy? }
-
-		if space.enemy?
-			warrior.attack!
-		elsif space.captive?
-			warrior.rescue!
-		elsif enemy_index && warrior.look.take(enemy_index).all? { |s| s.empty? }
-			warrior.shoot!
-		else
-			warrior.walk!
-		end
-	end
-
-	def solve_level_9
-		last_phase = 3
-		@current_health = warrior.health
-		@previous_health = @current_health unless @previous_health
-		@current_phase = 0 unless @current_phase
-
-		def current_phase_done?
-			spaces = warrior.look
-			spaces.last.wall? && spaces.take(2).all? { |s| s.empty? || s.stairs? || s.wall? }
-		end
-
-		def invert_direction
-			@current_phase += 1
-			warrior.pivot!
-		end
-
-		space = warrior.feel
-		enemy_index = warrior.look.find_index { |s| s.enemy? }
-
-		if @current_phase == 0 || (@current_phase != last_phase && current_phase_done?)
-			invert_direction
-		elsif	space.enemy?
-			warrior.attack!
-		elsif space.captive?
-			warrior.rescue!
-		elsif enemy_index && warrior.look.take(enemy_index).all? { |s| s.empty? }
-			warrior.shoot!
-		elsif !(space.stairs?) && need_rest?(@current_health, @previous_health)
-			warrior.rest!
-		else
-			warrior.walk!
-		end
-
-		@previous_health = @current_health
-	end
+	
 
 	def play_turn(warrior)
 		@warrior = warrior
+		#solve_level_1
+		#solve_level_2
+		#solve_level_3
+		#solve_level_4
+		#solve_level_5
+		#solve_level_6
+		#solve_level_7
+		#solve_level_8
 		solve_level_9
-			#level7 = Level7.new(@warrior, FULL_HEALTH)
-			#level7.solve_level_7
-			#Level1.new(warrior)
 	end
 end
