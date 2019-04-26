@@ -15,7 +15,9 @@ module Level9
 		@previous_health = @current_health unless @previous_health
 		@current_phase = 0 unless @current_phase
 		space = warrior.feel
-		enemy_index = warrior.look.find_index { |s| s.enemy? }
+		enemy_index = warrior.look.find_index(&:enemy?)
+		# can be written as: "enemy_index = warrior.look.find_index { |s| s.enemy? }"
+
 
 		if @current_phase == 0 || (@current_phase != last_phase && current_phase_done?)
 			change_phase

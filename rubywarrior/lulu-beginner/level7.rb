@@ -1,5 +1,5 @@
 module Level7
- def solve_level_7
+	def solve_level_7
 		@current_health = warrior.health
 		@previous_health = @current_health unless @previous_health
 		space = warrior.feel

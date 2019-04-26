@@ -24,7 +24,7 @@ class Player
 	attr_accessor :warrior
 
 	# "current_health > previous_health" means that the warrior has been
-	# resting (and can keep it) or al least not damaged
+	# resting (and can keep it) or at least not damaged
 	# "current_health = previous_health" means that the warrior got no
 	# damages in the previous turn (health kept the same during 2 turns) 
 	def need_rest?(current_health, previous_health)
